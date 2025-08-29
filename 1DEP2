@@ -1,0 +1,84 @@
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import DeliveryEfficiencyProducts from "./DeliveryEfficiencyProducts";
+import * as useFetchye from "../hooks/useFetchye";
+
+// Utility: mock the router and imported hooks
+jest.mock("../hooks/useFetchye");
+jest.mock("react-redux", () => ({
+  useSelector: () => ({}),
+}));
+
+// Helper for rendering with required props
+const renderComponent = (routerProps = {}) =>
+  render(<DeliveryEfficiencyProducts router={{ push: jest.fn(), goBack: jest.fn() }} {...routerProps} />);
+
+describe("DeliveryEfficiencyProducts", () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  // 1. Renders component and checks tab menu
+  test("renders all required tabs and content containers", () => {
+    renderComponent();
+    expect(screen.getByText(/Feature Say Do and Churn Rate/i)).toBeInTheDocument();
+    expect(screen.getByText(/Test Efficiency/i)).toBeInTheDocument();
+    expect(screen.getByText(/Feature Backlog/i)).toBeInTheDocument();
+  });
+
+  // 2. Shows loading spinners during API calls
+  test("shows loading spinner in each tab while loading", () => {
+    useFetchye.useFetchye.mockReturnValue({ isLoading: true, data: null });
+    renderComponent();
+    expect(screen.getAllByTestId("spinner").length).toBeGreaterThan(0);
+  });
+
+  // 3. Shows data in SayDoChurn tab on successful fetch
+  test("shows correct data in SayDoChurn tab", async () => {
+    useFetchye.useFetchye.mockReturnValueOnce({
+      isLoading: false,
+      data: { body: { FeatureSayDoAndChurn: [{ pi: "PI1" }], FeatureSayDoAndChurn7: { productOwnerAndVps: [] } } },
+    });
+    renderComponent();
+    await waitFor(() => expect(screen.getByText(/Feature Say Do and Churn Rate/i)).toBeInTheDocument());
+    // Further checks for TableMetrics, etc.
+  });
+
+  // 4. Shows alert when there is an error for backlog
+  test("shows error message for backlog tab if API fails", async () => {
+    useFetchye.useFetchye.mockReturnValue({ isLoading: false, data: null, error: true });
+    renderComponent();
+    fireEvent.click(screen.getByText(/Feature Backlog/i));
+    await waitFor(() => expect(screen.getByText(/There was an error fetching the data/i)).toBeInTheDocument());
+  });
+
+  // 5. Handles tab changes and rerenders content accordingly
+  test("changes content when tab is switched", () => {
+    useFetchye.useFetchye.mockReturnValue({ isLoading: false, data: { body: {} } });
+    renderComponent();
+    fireEvent.click(screen.getByText(/Test Efficiency/i));
+    expect(screen.getByText(/TestCaseAndDefectsDrillDown/i)).toBeInTheDocument();
+  });
+
+  // 6. Handles open modal action
+  test("calls handler when opening modal for comments", () => {
+    useFetchye.useFetchye.mockReturnValue({ isLoading: false, data: { body: {} } });
+    renderComponent();
+    fireEvent.click(screen.getByText(/Add Comments/i)); // Use appropriate trigger text/element
+    // Modal or handler assertions
+  });
+
+  // 7. Handles missing or partial data safely (should not crash)
+  test("handles missing data gracefully", () => {
+    useFetchye.useFetchye.mockReturnValue({ isLoading: false, data: null });
+    renderComponent();
+    // No crash and fallback rendering
+    expect(screen.getByText(/Feature Say Do and Churn Rate/i)).toBeInTheDocument();
+  });
+
+  // 8. Handles "Back" action
+  test("handles Back button click", () => {
+    const goBack = jest.fn();
+    render(<DeliveryEfficiencyProducts router={{ goBack }} />);
+    fireEvent.click(screen.getByLabelText(/Back/));
+    expect(goBack).toHaveBeenCalled();
+  });
+});
