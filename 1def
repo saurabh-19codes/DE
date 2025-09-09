@@ -1,3 +1,34 @@
+
+
+it('calls goToUserStoryDrillDown with correct params when drilldown icon is clicked', async () => {
+  // Arrange: render the component with the right product and props
+  render(
+    <Provider store={mockStore}>
+      <DeliveryEfficiencyFeatures
+        params={{ metric: 'SayDoChurn', org: 'GMST', product: mockProduct }}
+        router={{ push: mockRouterPush, goBack: jest.fn() }}
+      />
+    </Provider>
+  );
+
+  // Find the product row to drilldown on
+  const productRow = screen.getByText(mockProduct).closest('tr');
+  expect(productRow).toBeInTheDocument();
+
+  // Find the drilldown icon/button inside the row
+  const drilldownBtn = within(productRow).getByTestId('goToUserStoryDrillDown-btn').querySelector('svg');
+  expect(drilldownBtn).toBeInTheDocument();
+
+  // Act: simulate the click (the interaction that triggers goToUserStoryDrillDown)
+  fireEvent.click(drilldownBtn);
+
+  // Assert: the router push handler is called with the expected URL
+  const encodedProduct = encodeURIComponent(mockProduct);
+  const expectedUrl = `/organization/GMST/saydochurn/${encodedProduct}`;
+  expect(mockRouterPush).toHaveBeenCalledWith(expect.stringContaining(expectedUrl));
+});
+
+
 it('shows loading spinner when ratiodChurnData is loading', () => {
   useFetchy.mockReturnValue({ isLoading: true, data: null });
   render(
