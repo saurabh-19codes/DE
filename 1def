@@ -1,0 +1,54 @@
+it('shows loading spinner when ratiodChurnData is loading', () => {
+  useFetchy.mockReturnValue({ isLoading: true, data: null });
+  render(
+    <Provider store={mockStore}>
+      <DeliveryEfficiencyFeatures params={{ metric: 'SayDoChurn', org: 'GMST'}} router={{ push: jest.fn(), goBack: jest.fn() }} />
+    </Provider>
+  );
+  expect(screen.getByTestId('spinner')).toBeInTheDocument();
+}); 
+it('shows error message when API fails', () => {
+  useFetchy.mockReturnValue({ isLoading: false, error: true, data: null });
+  render(
+    <Provider store={mockStore}>
+      <DeliveryEfficiencyFeatures params={{ metric: 'SayDoChurn', org: 'GMST'}} router={{ push: jest.fn(), goBack: jest.fn() }} />
+    </Provider>
+  );
+  expect(screen.getByText(/error/i)).toBeInTheDocument();
+});it('opens modal with correct information on feedback button click', () => {
+  render(
+    <Provider store={mockStore}>
+      <DeliveryEfficiencyFeatures params={{ metric: 'SayDoChurn', org: 'GMST'}} router={{ push: jest.fn(), goBack: jest.fn() }} />
+    </Provider>
+  );
+  fireEvent.click(screen.getByTestId('icon-feedback-button'));
+  expect(useCommentWidget().open).toHaveBeenCalled();
+});
+it('hides removed features when toggle is off', () => {
+  render(
+    <Provider store={mockStore}>
+      <DeliveryEfficiencyFeatures params={{ metric: 'SayDoChurn', org: 'GMST'}} router={{ push: jest.fn(), goBack: jest.fn() }} />
+    </Provider>
+  );
+  fireEvent.click(screen.getByRole('switch'));
+  expect(screen.queryByText('Removed Feature')).not.toBeInTheDocument();
+});
+
+it('shows "No Data" when APIs return empty body', () => {
+  useFetchy.mockReturnValue({ isLoading: false, data: { body: {} } });
+  render(
+    <Provider store={mockStore}>
+      <DeliveryEfficiencyFeatures params={{ metric: 'SayDoChurn', org: 'GMST'}} router={{ push: jest.fn(), goBack: jest.fn() }} />
+    </Provider>
+  );
+  expect(screen.getByText(/No Data/i)).toBeInTheDocument();
+});
+it('updates data when a different PI is selected from dropdown', () => {
+  render(
+    <Provider store={mockStore}>
+      <DeliveryEfficiencyFeatures params={{ metric: 'SayDoChurn', org: 'GMST'}} router={{ push: jest.fn(), goBack: jest.fn() }} />
+    </Provider>
+  );
+  fireEvent.change(screen.getByTestId('pi-dropdown'), { target: { value: 'New PI' }});
+  expect(useFetchy).toHaveBeenCalledWith(expect.objectContaining({ piNames: ['New PI'] }));
+});
