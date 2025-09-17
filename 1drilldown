@@ -1,0 +1,117 @@
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import DeliveryFeatureDrillDown from './DeliveryFeatureDrillDown';
+
+// Mocks
+jest.mock('fetchye', () => ({
+  useFetchye: jest.fn(),
+}));
+const mockExportToCSV = jest.fn();
+jest.mock('../utils/exportToCSV', () => ({
+  exportToCSV: (...args) => mockExportToCSV(...args),
+}));
+
+// Always reset mocks between tests
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+const mockParams = {
+  // Use all realistic params, tweak for each scenario
+  featureType: 'User Stories',
+  chartType: 'testCasesAndDefectsDrillDown',
+  metric: '',
+  // Add all necessary param props according to the propTypes
+};
+
+function withFetch(data, isLoading = false) {
+  require('fetchye').useFetchye.mockReturnValue({
+    isLoading,
+    data: data ? { body: data } : undefined,
+    error: undefined,
+  });
+}
+
+describe('DeliveryFeatureDrillDown Table Heads', () => {
+  test('shows spinner when loading', () => {
+    withFetch(undefined, true);
+    render(<DeliveryFeatureDrillDown params={mockParams} />);
+    expect(screen.getByTestId('progress-circle')).toBeInTheDocument();
+  });
+
+  test('renders defects table and triggers export', () => {
+    withFetch({
+      defectsTableData: [{ id: 1, col1: 'X' }],
+      testCaseTableData: [{ id: 2, col1: 'Y' }],
+    });
+    render(<DeliveryFeatureDrillDown params={mockParams} />);
+    expect(screen.getByText('Defects')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /export/i }));
+    expect(mockExportToCSV).toHaveBeenCalled();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+  });
+
+  test('renders planned backlog table (BacklogReadiness)', () => {
+    withFetch({ plannedTableData: [{ id: 1 }] });
+    render(<DeliveryFeatureDrillDown params={{
+      ...mockParams, chartType: 'BacklogReadiness'
+    }} />);
+    expect(screen.getByText(/Backlog/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /export/i })).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+  });
+
+  test('renders analyzing and funnel table', () => {
+    withFetch({ currentTableData: [{ id: 1 }] });
+    render(<DeliveryFeatureDrillDown params={{
+      ...mockParams, chartType: 'BacklogReadiness'
+    }} />);
+    expect(screen.getByText(/Analyzing And Funnel/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /export/i }));
+    expect(mockExportToCSV).toHaveBeenCalled();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+  });
+
+  test('shows "No data found" for empty table arrays', () => {
+    withFetch({ defectsTableData: [], testCaseTableData: [] });
+    render(<DeliveryFeatureDrillDown params={mockParams} />);
+    expect(screen.getAllByText(/No data found/i).length).toBeGreaterThanOrEqual(1);
+  });
+  
+  test('renders export button only when data exists', () => {
+    withFetch({ plannedTableData: [], currentTableData: [] });
+    render(<DeliveryFeatureDrillDown params={{
+      ...mockParams, chartType: 'BacklogReadiness'
+    }} />);
+    expect(screen.queryByRole('button', { name: /export/i })).not.toBeInTheDocument();
+  });
+
+  // Repeat similar tests for each featureType/metric/branch:
+  // E-containers, SayDoChurn, User Stories, testCasesEconTableData, backlogEconTableData, etc.
+  test('renders E-containers - SayDoChurn correctly', () => {
+    withFetch({ sprintEconTableData7: [{ id: 1 }], saydoEconTableData: [{ id: 1 }] });
+    render(<DeliveryFeatureDrillDown params={{
+      ...mockParams,
+      featureType: 'E-containers',
+      metric: 'SayDoChurn',
+      chartType: 'someChartForEcontainers',
+    }} />);
+    expect(screen.getByText(/Planned/i)).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /export/i })).toBeInTheDocument();
+  });
+
+  test('renders correct table for testCasesEconTableData', () => {
+    withFetch({ testCasesEconTableData7: [{ id: 1 }] });
+    render(<DeliveryFeatureDrillDown params={{
+      ...mockParams,
+      featureType: 'User Stories',
+      chartType: 'EconTestCases'
+    }} />);
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /export/i })).toBeInTheDocument();
+  });
+
+  // Continue with more granular and edge case permutations as needed (see code for all conditions)
+});
+
