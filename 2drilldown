@@ -1,0 +1,106 @@
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import DeliveryFeatureDrillDown from "./DeliveryFeatureDrillDown";
+import * as fetchye from "fetchye";
+
+// Mock fetchye’s useFetchye with various data sets
+jest.mock("fetchye");
+
+// Default params config, modify per case as appropriate
+const baseParams = {
+  featureType: "User Stories",
+  chartType: "testCasesAndDefectsDrillDown",
+  metric: "",
+  // ...any other default/required params...
+};
+
+function setup({ params = baseParams, data = {}, isLoading = false }) {
+  fetchye.useFetchye.mockReturnValue({
+    isLoading,
+    data: { body: data },
+    error: null,
+  });
+  render(<DeliveryFeatureDrillDown params={params} />);
+}
+
+describe("DeliveryFeatureDrillDown", () => {
+  it("shows loader while data is loading", () => {
+    setup({ isLoading: true });
+    expect(screen.getByTestId(/progress/i)).toBeInTheDocument();
+  });
+
+  it("renders defects table and export button", () => {
+    setup({
+      data: { defectsTableData: [{ id: 1 }] },
+    });
+    expect(screen.getByText(/Defects/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /export/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /export/i }));
+  });
+
+  it("renders planned backlog table (BacklogReadiness)", () => {
+    const params = { ...baseParams, chartType: "BacklogReadiness" };
+    setup({
+      params,
+      data: { plannedTableData: [{ id: 1 }] },
+    });
+    expect(screen.getByText(/Backlog/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /export/i })).toBeInTheDocument();
+    expect(screen.getByRole("table")).toBeInTheDocument();
+  });
+
+  it("renders analyzing and funnel table + export", () => {
+    const params = { ...baseParams, chartType: "BacklogReadiness" };
+    setup({
+      params,
+      data: { currentTableData: [{ id: 1 }] },
+    });
+    expect(screen.getByText(/Analyzing And Funnel/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /export/i }));
+  });
+
+  it("renders test cases table when testCasesEconTableData7 present", () => {
+    setup({
+      data: { testCasesEconTableData7: [{ id: 1 }] },
+      params: { ...baseParams, featureType: "User Stories" },
+    });
+    expect(screen.getByRole("button", { name: /export/i })).toBeInTheDocument();
+    expect(screen.getByRole("table")).toBeInTheDocument();
+  });
+
+  it("renders backlog econ table when backlogEconTableData present", () => {
+    setup({
+      data: { backlogEconTableData: [{ id: 2 }] },
+      params: { ...baseParams, featureType: "User Stories" },
+    });
+    expect(screen.getByRole("button", { name: /export/i })).toBeInTheDocument();
+    expect(screen.getByRole("table")).toBeInTheDocument();
+  });
+
+  it("renders E-container - SayDoChurn scenario", () => {
+    setup({
+      data: { sprintEconTableData7: [{ id: 3 }] },
+      params: { ...baseParams, featureType: "E-containers", metric: "SayDoChurn" },
+    });
+    expect(screen.getByText(/Planned/i)).toBeInTheDocument();
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /export/i })).toBeInTheDocument();
+  });
+
+  it("renders no data found when datasets are empty", () => {
+    setup({
+      data: { defectsTableData: [], plannedTableData: [] },
+    });
+    expect(screen.getAllByText(/no data found/i).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("does not render export button when no table data", () => {
+    setup({
+      data: { defectsTableData: [], testCaseTableData: [] },
+    });
+    expect(screen.queryByRole("button", { name: /export/i })).not.toBeInTheDocument();
+  });
+
+  // Add further cases for:
+  // backlogEconTableDefinedData branches, combination of planned+current = 0, etc, as seen in your code branches
+});
