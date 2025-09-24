@@ -1,0 +1,8 @@
+Team/Component,Total ADRs,Active ADRs,Approved ADRs,Design Review Status,Implementation Status,Tech Debt Impact,Last Updated,Next Review Date
+Payment Gateway Service,8,6,7,88% (7/8),75% (6/8),Medium,2025-09-21,2025-10-01
+Transaction Processing API,7,5,6,86% (6/7),71% (5/7),High,2025-09-19,2025-09-29
+Fraud Detection Engine,6,4,5,83% (5/6),67% (4/6),Medium,2025-09-20,2025-09-30
+Billing Management System,9,7,8,89% (8/9),78% (7/9),Medium,2025-09-23,2025-10-03
+Invoice Generation Service,5,3,4,100% (5/5),80% (4/5),Low,2025-09-17,2025-09-27
+Refund Processing Module,7,5,6,86% (6/7),71% (5/7),Medium,2025-09-22,2025-10-02
+Audit Trail System,6,4,5,83% (5/6),67% (4/6),Low,2025-09-18,2025-09-28

@@ -1,0 +1,4 @@
+Team/Component,Total ADRs,Active ADRs,Approved ADRs,Design Review Status,Implementation Status,Tech Debt Impact,Last Updated,Next Review Date
+Authentication Microservice,5,3,4,85% (4/5),80% (4/5),Low,2025-09-20,2025-09-30
+User Management API,6,4,5,83% (5/6),67% (4/6),Medium,2025-09-18,2025-09-28
+Session Handler Service,4,2,3,100% (4/4),75% (3/4),Low,2025-09-22,2025-10-05
