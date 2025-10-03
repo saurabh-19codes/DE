@@ -1,0 +1,71 @@
+please provide separate points for context, problem statement and scope
+
+Here is the revised ADR section, explicitly separating **Context**, **Problem Statement**, and **Scope** using the new insights from your screenshots [1][2]:
+
+***
+
+## Context
+
+- The One-Insight platform is used to monitor application journeys, platform health, and system availability using real-time data pulls and reporting from various components such as Kibana, Dynatrace, Rally, Kafka, and others.
+- Merchant journeys represent individual processes or workflows within applications that are crucial for overall business operation and user experience.
+- Teams rely on both batch and API integrations to bring journey data into One-Insight, leveraging daily, hourly, and weekly ingestion patterns [1].
+
+***
+
+## Problem Statement
+
+- There is currently no centralized solution for tracking the availability or health of merchant journeys within existing systems, leading to uncertainties and inefficiencies in issue detection and resolution.
+- Absence of comprehensive and accessible documentation about available merchant journeys makes it difficult for teams to understand the landscape and quickly identify or resolve issues.
+- Lack of real-time or near real-time insights impacts the ability to maintain high platform health and promptly respond to failures or anomalies [2].
+
+***
+
+## Scope
+
+- The decision applies to all components and teams onboarding to the One-Insight platform for merchant journey observability and availability tracking.
+- It includes both real-time (API) and batch data ingestion and reporting, supporting technical integration from multiple application environments.
+- Journey availability coverage will be expanded to include health, documentation, monitoring, and hierarchical representation for all relevant components in scope [1][2].
+
+***
+
+This structure covers all details with clarity, making it easy to align with your ADR documentation standards.Here is a breakdown with clear, separate points for **Context**, **Problem Statement**, and **Scope** based on the images and information provided [1][2]:
+
+***
+
+### Context
+
+- The One-Insight platform is designed for comprehensive monitoring and reporting of application journeys, platform health, and overall system availability.
+- It aggregates data from various component sources (Kibana, Dynatrace, Rally, Kafka, Jira, Jenkins, SonarQube, Release, ServiceNow, Superset, Test Automation, etc.) via hourly, daily, and weekly backend pulls.
+- Application journeys, especially merchant journeys, are crucial business processes whose health and status should be continuously tracked to support operational reliability.
+
+### Problem Statement
+
+- There is a notable absence of a feature that enables tracking the availability and health of merchant application journeys within the platform.
+- Without centralized and near real-time tracking, issue identification and resolution for merchant journeys is slow, leading to delays and uncertainty in platform health management.
+- Teams lack unified documentation and visibility for application journeys, making it challenging to reference, monitor, and resolve system issues efficiently.
+
+### Scope
+
+- This decision targets the onboarding of API and Batch components, across applications, into the One-Insight platform for unified observability.
+- It encompasses integration of merchant journey data through various backend pulls, normalization, and reporting within One-Insight’s architecture.
+- The scope includes establishing hierarchical monitoring and reporting of platform journeys, supporting both batch and real-time use cases for all relevant system components.
+
+***
+
+These points align with the ADR format and reflect the details from your screenshots.### Context
+- The One-Insight platform brings together real-time and batch data from multiple systems (Kibana, Dynatrace, Kafka, SonarQube, Jenkins, Rally, Jira, ServiceNow, Release, Superset, etc.) to enable monitoring and reporting on application journeys and platform health [1].
+- Monitoring merchant journeys is crucial for understanding platform availability and helping teams identify, address, and resolve issues with application components in production environments [2].
+
+### Problem Statement
+- The lack of an integrated journey availability feature in One-Insight prevents teams from tracking health and status of merchant application journeys, impacting reliability and responsiveness [2].
+- Without centralized documentation and monitoring, problem identification and troubleshooting become slow and complex, increasing delays and the risks of unresolved failures [2].
+- Teams face difficulties referencing and understanding the full landscape of merchant journeys, which further compounds the challenge of effective issue resolution [2].
+
+### Scope
+- This ADR covers onboarding of API and Batch components into the One-Insight platform for comprehensive journey observability and availability tracking [1].
+- It includes the identification, normalization, and reporting of merchant journeys using backend pulls from a hierarchy of integrated components [1].
+- The solution is applicable to all environments where merchant journeys exist, supporting continuous monitoring, self-service configurability, and hierarchical availability reporting [2].
+
+Citations:
+[1] selected_image_5152737993002267437.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/54548800/f24d9a4a-205c-4c9a-a5c1-c40502b96251/selected_image_5152737993002267437.jpg
+[2] selected_image_3770297126842623665.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/54548800/1b4e7b50-441b-40a1-b6d8-d8014b893bd6/selected_image_3770297126842623665.jpg
