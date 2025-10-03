@@ -65,7 +65,3 @@ These points align with the ADR format and reflect the details from your screens
 - This ADR covers onboarding of API and Batch components into the One-Insight platform for comprehensive journey observability and availability tracking [1].
 - It includes the identification, normalization, and reporting of merchant journeys using backend pulls from a hierarchy of integrated components [1].
 - The solution is applicable to all environments where merchant journeys exist, supporting continuous monitoring, self-service configurability, and hierarchical availability reporting [2].
-
-Citations:
-[1] selected_image_5152737993002267437.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/54548800/f24d9a4a-205c-4c9a-a5c1-c40502b96251/selected_image_5152737993002267437.jpg
-[2] selected_image_3770297126842623665.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/54548800/1b4e7b50-441b-40a1-b6d8-d8014b893bd6/selected_image_3770297126842623665.jpg
