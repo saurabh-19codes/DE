@@ -1,0 +1,99 @@
+using this information can you please provide the adr in the same format as I provided above
+
+Here is an ADR (Architecture Decision Record) capturing the One-Insight Merchant Journeys Availability decision, based on your provided template and the content from the images [1][2]:
+
+***
+
+## Architecture Decision Name
+
+**Merchant Journeys Availability Tracking on One-Insight Platform**
+
+**Author:** Rohini Nakka  
+**Date Proposed:** Feb 12, 2025  
+**Reviewed by Architecture Review Council:** [yes] (Feb 12, 2025)
+
+***
+
+### Context, Problem Statement and Scope
+
+Currently, there is a gap in the One-Insight platform: there is no dedicated feature to track the availability and status of merchant application journeys across the system. This limits the ability to monitor overall platform health, delays issue resolution due to lack of visibility, and prevents centralized documentation of active merchant journeys. Teams struggle to proactively and efficiently reference application journey status, which often complicates issue identification and problem resolution [2].
+
+***
+
+### Decision Drivers
+
+- **Need for centralized, real-time visibility on application journeys and platform health**
+- **Requirement for prompt issue detection and tracking**
+- **Teams face delays in resolving issues due to lack of documentation**
+- **Support for self-service reporting across all environments**
+- **Continuous monitoring and near real-time feedback on journey operations**
+
+***
+
+### Considered Options
+
+- *Option 1: Status Quo – Continue without journey availability tracking*  
+	- **Pros:** No additional development effort required  
+	- **Cons:** Ongoing delays in troubleshooting, no centralized reporting, inefficient processes
+
+- *Option 2: Integrate continuous, real-time merchant journey monitoring using One-Insight's new module*  
+	- **Pros:** Proactive health reporting, improved issue resolution efficiency, documentation and analytics available for teams, self-service and configurable reports enabled  
+	- **Cons:** Requires initial onboarding effort for components, platform integration work, possible need for environment-specific data pulls
+
+***
+
+### Decision Outcome
+
+**Final Decision**:  
+Onboard merchant journey components to the One-Insight platform. Implement new backend and observability modules enabling batch and API data pulls, centralized storage, near real-time status validation, and hierarchical journey reporting with self-service capability [1][2].
+
+***
+
+### Consequences
+
+- **Positive Consequences:**  
+	- Continuous, automated monitoring of application journeys and platform health  
+	- Teams gain faster and documented access to journey status, reducing delays  
+	- Near real-time operational feedback for success/failure validation  
+	- Self-service and configurability, empowering users to tailor their own reports  
+	- Holistic metrics reporting and analytics
+
+- **Negative Consequences:**  
+	- Initial onboarding requires technical effort to connect components  
+	- Increased system complexity with additional reporting and data pipelines  
+	- Potential need to synchronize data sources and resolve integration challenges
+
+***
+
+### Technical Debt
+
+- Integration of legacy systems and batch components may introduce migration and compatibility challenges.
+- Additional maintenance will be needed to keep reporting pipelines in sync as platform evolves [1][2].
+
+***
+
+### PCI DSS Impact
+
+- No direct cardholder data is stored, processed, or transmitted in this module.
+- Monitoring and reporting systems should be reviewed periodically for any inadvertent exposure through logging or ticketing integrations.
+
+***
+
+### Patent Considerations
+
+- No immediate opportunity for patents identified; leverage existing monitoring and reporting solutions.
+
+***
+
+### More Information
+
+- Journey data is collected using a mix of tools (Kibana, Dynatrace, Kafka, Rally, Jira, Jenkins, SonarQube, Release, ServiceNow, Superset) in real time, batch, and periodic pulls.
+- Observability architecture supports hierarchical journey views, facilitating comprehensive availability tracking and reporting for platform health and individual journeys [1].
+
+***
+
+This ADR summarizes the architecture and process for merchant journey availability tracking using One-Insight, following your format precisely and integrating all relevant information from both screenshots.
+
+Citations:
+[1] selected_image_5152737993002267437.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/54548800/f24d9a4a-205c-4c9a-a5c1-c40502b96251/selected_image_5152737993002267437.jpg?AWSAccessKeyId=ASIA2F3EMEYESKWLOY2K&Signature=bIovGGc9ADd0SUu%2BBZw3obfuD%2BE%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEK3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQDCi29WtaMxD3TbVcuLMwtc7ul1cSo5qmc2h3EKhvVQ4gIhAIj5Ei2SLY%2FjZEYqeeVi2rCRvBwl7WqWK99R0Oxy7tHbKvEECEUQARoMNjk5NzUzMzA5NzA1IgwcJZnzGXbULMzDy0IqzgS0KejeGHf1ikReXq3iokUhraGZm2Q5Ycj%2FyWGU3I%2BvSolqUHr9DQKmQ4%2F032SPYvZAmLzhpJxpqQ1XnvNc2piFzCwHFKeQbtMLHKzp4p29sE6qBhXDKb9ZN8K910%2FzS%2FU81vo94getuiAYZPMPYOJa4rXWkLtMi39OOK7sfChOYy4hMXckQCzECGW%2FLxFyNKcUqJ%2B%2FQ9fSZ7nmUhxyBYjJDUu4PtMKBSeTzOztksOq1h%2BSIIF3Z%2FTYx3ED0WfcS6Q1O9oCHC4CXkTRJzXbuQZPNiyQKSa2cqhwEccU5eVq5YfLh4Ga6kTV1EfEOyTLjbiIo8Q7%2Bd1pDIM0xZ4VvRr%2BHdHQMt6EafAIgEFxxsTwoPN9wD1LuaKgurRhwJ6kEmf4%2F4bA6%2FT3yLrvYKuX4j2Sbli6olWkmPwIKuCVGnMBgnW5NLI5MpvHrPQajub0gPyCHCG%2BW%2FqxXC0y8TIHEIjOz7X3l3%2BxqKjvtl%2BKNOgVJ9X%2FOwyl7Jopdl%2BDQ0z9oiIFdSJ6g%2F6aTbqNxNJmjzsKcb1Oer1eH0gImgOITDK%2F%2FcXyYfhpegEWldOBe8%2FgKksaVJMAm83jR18yBVj61eRQEuPqcIO1cMq9G8M1YuFfz9JZ3W5avWwd83Pp58ti19GtKuha%2FNhN3%2BtQ78N47NHQqpmOgsXWifrro9E3hvNBVNiHRoHm7gwlI2%2FEwx2Ho5KGKn32%2FQcTr88PQQe%2B9MHCGFURm70Xay08fSRduiNJUwqrQYHLovoNI0YA4lcRGaoLpdDILJ17gJXorxW4bjC4%2BP7GBjqZAfFxzzzYZ07DA01D682c%2Fs2RQe47llYwI5Jz7e1L4TCSQNgkvPMZIZAzigvSFCgfdUYm3GbMwejn9Cnm0iira7lH4OTd9mf1dv0MyegzDxyf0nXFH2JwYLg5kIAswZjxiAE49P%2BBjVrMnkIU%2FpmjDEDP4OKK4FRdk9fzXnlVI3VctTR7M2jMhFjItaE3Z6WwTd%2BhEj8ab2sz8g%3D%3D&Expires=1759493847
+[2] selected_image_3770297126842623665.jpg https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/images/54548800/1b4e7b50-441b-40a1-b6d8-d8014b893bd6/selected_image_3770297126842623665.jpg?AWSAccessKeyId=ASIA2F3EMEYESKWLOY2K&Signature=SyfijwN7fKOuTApN35d0cynk7wg%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEK3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQDCi29WtaMxD3TbVcuLMwtc7ul1cSo5qmc2h3EKhvVQ4gIhAIj5Ei2SLY%2FjZEYqeeVi2rCRvBwl7WqWK99R0Oxy7tHbKvEECEUQARoMNjk5NzUzMzA5NzA1IgwcJZnzGXbULMzDy0IqzgS0KejeGHf1ikReXq3iokUhraGZm2Q5Ycj%2FyWGU3I%2BvSolqUHr9DQKmQ4%2F032SPYvZAmLzhpJxpqQ1XnvNc2piFzCwHFKeQbtMLHKzp4p29sE6qBhXDKb9ZN8K910%2FzS%2FU81vo94getuiAYZPMPYOJa4rXWkLtMi39OOK7sfChOYy4hMXckQCzECGW%2FLxFyNKcUqJ%2B%2FQ9fSZ7nmUhxyBYjJDUu4PtMKBSeTzOztksOq1h%2BSIIF3Z%2FTYx3ED0WfcS6Q1O9oCHC4CXkTRJzXbuQZPNiyQKSa2cqhwEccU5eVq5YfLh4Ga6kTV1EfEOyTLjbiIo8Q7%2Bd1pDIM0xZ4VvRr%2BHdHQMt6EafAIgEFxxsTwoPN9wD1LuaKgurRhwJ6kEmf4%2F4bA6%2FT3yLrvYKuX4j2Sbli6olWkmPwIKuCVGnMBgnW5NLI5MpvHrPQajub0gPyCHCG%2BW%2FqxXC0y8TIHEIjOz7X3l3%2BxqKjvtl%2BKNOgVJ9X%2FOwyl7Jopdl%2BDQ0z9oiIFdSJ6g%2F6aTbqNxNJmjzsKcb1Oer1eH0gImgOITDK%2F%2FcXyYfhpegEWldOBe8%2FgKksaVJMAm83jR18yBVj61eRQEuPqcIO1cMq9G8M1YuFfz9JZ3W5avWwd83Pp58ti19GtKuha%2FNhN3%2BtQ78N47NHQqpmOgsXWifrro9E3hvNBVNiHRoHm7gwlI2%2FEwx2Ho5KGKn32%2FQcTr88PQQe%2B9MHCGFURm70Xay08fSRduiNJUwqrQYHLovoNI0YA4lcRGaoLpdDILJ17gJXorxW4bjC4%2BP7GBjqZAfFxzzzYZ07DA01D682c%2Fs2RQe47llYwI5Jz7e1L4TCSQNgkvPMZIZAzigvSFCgfdUYm3GbMwejn9Cnm0iira7lH4OTd9mf1dv0MyegzDxyf0nXFH2JwYLg5kIAswZjxiAE49P%2BBjVrMnkIU%2FpmjDEDP4OKK4FRdk9fzXnlVI3VctTR7M2jMhFjItaE3Z6WwTd%2BhEj8ab2sz8g%3D%3D&Expires=1759493847
