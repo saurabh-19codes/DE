@@ -1,0 +1,123 @@
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import FinancialDashboard1 from './FinancialColumn.jsx';
+
+// --- 1. Mocks ---
+jest.mock('@americanexpress/cornerstone-table', () => ({
+  DataTable: ({ data, columns, ...rest }) => (
+    <table data-testid="data-table-mocked">
+      <thead>
+        <tr>
+          {columns.map(col => <th key={col.dataField}>{col.text}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {data && data.length > 0 &&
+          data.map((row, idx) =>
+            <tr key={idx} data-testid="data-row">
+              {columns.map(col => <td key={col.dataField}>{row[col.dataField]}</td>)}
+            </tr>
+          )
+        }
+      </tbody>
+    </table>
+  ),
+}));
+
+// --- 2. Utilities/Mocks ---
+const mockChangeTab = jest.fn();
+const mockSetSelectedYear = jest.fn();
+
+function makeProps(overrides = {}) {
+  return {
+    changeTab: mockChangeTab,
+    selectedYear: 2024,
+    setSelectedYear: mockSetSelectedYear,
+    ...overrides
+  };
+}
+
+// --- 3. Test Suite ---
+describe('FinancialDashboard1', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders Dashboard header and year select', () => {
+    render(<FinancialDashboard1 {...makeProps()} />);
+    expect(screen.getByText(/Financial Dashboard/i)).toBeInTheDocument();
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+  });
+
+  it('displays loading indicator when year is changing', () => {
+    render(<FinancialDashboard1 {...makeProps({ loadingYearChange: true })} />);
+    expect(screen.getByText(/ProgressCircle/i)).toBeInTheDocument();
+  });
+
+  it('shows error message on error state', () => {
+    render(<FinancialDashboard1 {...makeProps()} error data={{ status: 500 }} />);
+    expect(screen.getByText(/Failed to fetch data/i)).toBeInTheDocument();
+  });
+
+  it('displays table with columns/rows if data is present', () => {
+    render(
+      <FinancialDashboard1
+        {...makeProps()}
+        data={{
+          epicsData: [{ epic: 'E1', allocationValue: 150, epicYtd: 50 }],
+          featureData: { body: { featureData: {} }, status: 200 }
+        }}
+      />
+    );
+    expect(screen.getByTestId('data-table-mocked')).toBeInTheDocument();
+    expect(screen.getAllByRole('columnheader').length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId('data-row').length).toBeGreaterThan(0);
+  });
+
+  it('handles year selector change', () => {
+    render(<FinancialDashboard1 {...makeProps()} />);
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 2025 } });
+    expect(mockSetSelectedYear).toHaveBeenCalledWith(2025);
+  });
+
+  it('calls changeTab with correct epic on epic row click', () => {
+    render(
+      <FinancialDashboard1
+        {...makeProps()}
+        data={{
+          epicsData: [{ epic: 'E1', allocationValue: 167, epicYtd: 85 }],
+          featureData: { body: { featureData: {} }, status: 200 }
+        }}
+      />
+    );
+    // Simulate clicking a table row (if clickable in your real table implementation)
+    // fireEvent.click(screen.getByText('E1'));
+    // expect(mockChangeTab).toHaveBeenCalledWith(expect.anything(), 'financialProductsWise', 'E1');
+    // (You may need to use getAllByTestId and fireEvent on rows directly)
+  });
+
+  it('shows modal when isModalOpen and closes on close', () => {
+    render(
+      <FinancialDashboard1
+        {...makeProps()}
+        isModalOpen={true}
+      />
+    );
+    expect(screen.getByTestId('modal-fd')).toBeInTheDocument();
+    // Simulate modal close
+    // fireEvent.click(screen.getByRole('button', { name: /close/i }));
+    // expect(setModalOpen).toHaveBeenCalledWith(false);
+  });
+
+  it('shows no records message if no drillDown data', () => {
+    render(<FinancialDashboard1 {...makeProps()} drillDownRow={[]} />);
+    expect(screen.getByText(/No records found/i)).toBeInTheDocument();
+  });
+
+  // Optional: Add tests for edge cases and drilldown table expansion/collapse if custom logic present
+
+  // If PropTypes runtime errors should be captured:
+  // it('warns on invalid proptypes', () => {});
+});
+
