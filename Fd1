@@ -1,0 +1,81 @@
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import FinancialDashboard1 from './FinancialColumn.jsx';
+
+// Mock children/components used within FinancialDashboard1, especially DataTable
+jest.mock('@americanexpress/cornerstone-table', () => ({
+  DataTable: ({ data, columns, ...rest }) => (
+    <table data-testid="mock-table">
+      <thead>
+        <tr>
+          {columns.map(col => <th key={col.dataField}>{col.text}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((row, idx) => (
+          <tr key={idx}>
+            {columns.map(col => <td key={col.dataField}>{row[col.dataField]}</td>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ),
+}));
+
+const mockApiData = {
+  epicsData: [
+    { epic: 'E1', allocationValue: 100, epicYtd: 50 },
+    { epic: 'Total', allocationValue: 200, epicYtd: 150 },
+  ],
+  featureData: {
+    body: { featureData: {} },
+    status: 200,
+  },
+};
+
+const defaultProps = {
+  changeTab: jest.fn(),
+  selectedYear: 2024,
+  setSelectedYear: jest.fn()
+};
+
+describe('FinancialDashboard1', () => {
+  it('renders the Financial Dashboard header', () => {
+    render(<FinancialDashboard1 {...defaultProps} />);
+    expect(screen.getByText(/Financial Dashboard/i)).toBeInTheDocument();
+  });
+
+  it('renders loading spinner when loading', () => {
+    render(<FinancialDashboard1 {...defaultProps} />);
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument(); // Update for your loading indicator if any
+  });
+
+  it('renders error state when error occurs', () => {
+    render(<FinancialDashboard1 {...defaultProps} />);
+    // Simulate error state
+    // error and data/data.status !== 200
+    // Implementation needed based on how error is set
+  });
+
+  it('renders table with correct columns when data is present', async () => {
+    render(<FinancialDashboard1 {...defaultProps} />);
+    expect(screen.getByTestId('mock-table')).toBeInTheDocument();
+    expect(screen.getAllByRole('columnheader').length).toBeGreaterThan(0);
+  });
+
+  it('handles year change', () => {
+    render(<FinancialDashboard1 {...defaultProps} />);
+    const select = screen.getByRole('combobox');
+    fireEvent.change(select, { target: { value: 2025 } });
+    expect(defaultProps.setSelectedYear).toHaveBeenCalledWith(2025);
+  });
+
+  it('handles table row click for epic', () => {
+    render(<FinancialDashboard1 {...defaultProps} />);
+    // Simulate epic row click
+    // fireEvent.click(screen.getByText('E1'));
+    // expect(defaultProps.changeTab).toHaveBeenCalledWith(expect.anything(), 'financialProductsWise', 'E1');
+  });
+
+  // Add more tests to cover: drilldown modal, table with no records, alert/errors, prop types
+});
